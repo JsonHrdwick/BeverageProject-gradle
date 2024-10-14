@@ -12,6 +12,10 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
+    implementation 'com.thoughtworks.xstream:xstream:1.4.20'
+
+
 }
 
 test {

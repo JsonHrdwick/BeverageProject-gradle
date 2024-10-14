@@ -1,5 +1,10 @@
 package org.example;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.security.AnyTypePermission;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -7,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+
+//@XStreamAlias("SodaClass")
 
 class Soda implements Beverage, Serializable, Comparable<Soda> {
     private String name;
@@ -75,12 +82,14 @@ class Soda implements Beverage, Serializable, Comparable<Soda> {
         return formatValues(data);
     }
 
+    // Serialize Set
     public static void setToCSV(Set<Soda> sodas, String filename) throws IOException {
         for (Beverage soda : sodas) {
             serializeToCSV(soda, filename);
         }
     }
 
+    // Deserialize Set
     public static TreeSet<Soda> setFromCSV(String filename) throws OutOfMemoryError, IOException {
         TreeSet<Soda> sodaSet = new TreeSet<>();
         Path path = Paths.get(filename);
@@ -96,6 +105,27 @@ class Soda implements Beverage, Serializable, Comparable<Soda> {
         return sodaSet;
     }
 
+    // Serialize to XML
+    public static void serializeToXML(Beverage soda, String filename) throws IOException {
+        XStream xstream = new XStream(new StaxDriver());
+        xstream.processAnnotations(Soda.class);
+        String dataXML = xstream.toXML(soda);
+        Path path = Paths.get(filename);
+        Files.writeString(path, dataXML);
+    }
+
+    // Deserialize from XML
+    public static Soda deserializeFromXML(String filename) throws OutOfMemoryError, IOException {
+        Path path = Paths.get(filename);
+        XStream xstream = new XStream(new StaxDriver());
+        String[] type = new String[]{"Soda"};
+        Class[] types = new Class[]{Soda.class};
+        xstream.allowTypes(types);
+        String dataXML = Files.readString(path);
+        return (Soda) xstream.fromXML(dataXML);
+    }
+
+
     // Formats deserialized into object class
     private static Soda formatValues(String[] data){
         // Default data values
@@ -110,10 +140,12 @@ class Soda implements Beverage, Serializable, Comparable<Soda> {
         return new Soda(data[0].trim(), Double.parseDouble(data[1].trim()), Integer.parseInt(data[2].trim()), Integer.parseInt(data[3].trim()));
     }
 
+    // Format CSV output
     private static String prettyPrintCSV(Beverage soda) {
         return soda.getName() + "," + soda.getPrice() + "," + soda.getCalories() + "," + soda.getFlOz() + "\n";
     }
 
+    // Print class information
     public static void sodaPrint(Beverage soda) {
         System.out.println(soda.getName() + " , $" + soda.getPrice() + " , " + soda.getCalories() + " , " + soda.getFlOz());
     }

@@ -69,6 +69,17 @@ class SodaTest {
 
         assertEquals(testSet, deserializeSet);
     }
+    @Test
+    void toAndFromXML() throws IOException {
+        Beverage testSoda = new Soda("Coke", 2.99, 200, 32);
+        Soda.serializeToXML(testSoda, "src/test/java/org/example/XMLSerializeTest.xml");
+        Soda.sodaPrint(testSoda);
+        System.out.println();
+        Beverage newSoda = Soda.deserializeFromXML("src/test/java/org/example/XMLSerializeTest.xml");
+        Soda.sodaPrint(newSoda);
+
+        assertTrue(testSoda.equals(newSoda));
+    }
 
     @Test
     void compareTest() throws IOException {
