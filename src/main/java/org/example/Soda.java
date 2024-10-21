@@ -5,8 +5,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -125,6 +125,27 @@ class Soda implements Beverage, Serializable, Comparable<Soda> {
         return (Soda) xstream.fromXML(dataXML);
     }
 
+    // Serialize to Binary
+    public static void serializeToBinary(Beverage soda, String filename) throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(soda);
+            byte[] data = baos.toByteArray();
+            Path filePath = Paths.get(filename);
+            Files.write(filePath, data);
+        }
+    }
+
+    // Deserialize from Binary
+    public static Beverage deserializeFromBinary(String filename) throws OutOfMemoryError, IOException {
+        Path filePath = Paths.get(filename);
+        byte[] data = Files.readAllBytes(filePath);
+        try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data))) {
+            return (Beverage) ois.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     // Formats deserialized into object class
     private static Soda formatValues(String[] data){

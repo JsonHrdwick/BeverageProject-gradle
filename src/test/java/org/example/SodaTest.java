@@ -82,6 +82,18 @@ class SodaTest {
     }
 
     @Test
+    void toAndFromBinary() throws IOException {
+        Beverage testSoda = new Soda("Coke", 2.99, 200, 32);
+        Soda.serializeToBinary(testSoda, "src/test/java/org/example/BinarySerializeTest.binary");
+        Soda.sodaPrint(testSoda);
+        System.out.println();
+        Beverage newSoda = Soda.deserializeFromBinary("src/test/java/org/example/BinarySerializeTest.binary");
+        Soda.sodaPrint(newSoda);
+
+        assertTrue(testSoda.equals(newSoda));
+    }
+
+    @Test
     void compareTest() throws IOException {
         Soda testSoda = new Soda("Sprite", 2.99, 200, 32);
         Soda testSoda2 = new Soda("Coke", 2.99, 200, 32);
